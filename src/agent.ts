@@ -7,11 +7,12 @@ import { Ollama } from "ollama";
 import type { Message } from "ollama";
 import { tools, callTool } from "./tools.js";
 import { getSchema } from "./db.js";
+import defaultConfig from './config.js'
 
-const OLLAMA_HOST = process.env.OLLAMA_HOST ?? "http://127.0.0.1:11434";
+const OLLAMA_HOST = process.env.OLLAMA_HOST ?? defaultConfig.ollamaHost
 const MAX_TOOL_ITERATIONS = 8;
 
-export const MODEL = process.env.OLLAMA_MODEL ?? "llama3.1";
+export const MODEL = process.env.OLLAMA_MODEL ?? defaultConfig.model
 
 export const client = new Ollama({ host: OLLAMA_HOST });
 
