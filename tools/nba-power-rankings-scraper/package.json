@@ -1,0 +1,16 @@
+{
+  "name": "nba-power-rankings-scraper",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Scrapes NBA.com's weekly Power Rankings articles into JSON.",
+  "scripts": {
+    "scrape": "tsx src/cli.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
+  }
+}
