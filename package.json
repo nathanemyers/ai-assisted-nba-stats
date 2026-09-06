@@ -9,7 +9,8 @@
     "start": "tsx src/cli.ts",
     "build": "tsc -p .",
     "typecheck": "tsc --noEmit",
-    "build-db": "python3 build_db.py"
+    "build-db": "python3 build_db.py",
+    "scrapeNBA": "tsx tools/nba-power-rankings-scraper/cli.ts"
   },
   "dependencies": {
     "better-sqlite3": "^11.3.0",
