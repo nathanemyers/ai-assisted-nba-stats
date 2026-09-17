@@ -83,10 +83,10 @@ Each article file looks like:
       "teamName": "San Antonio Spurs",
       "teamLink": "https://www.nba.com/spurs/",
       "summaryHtml": "<p><strong>Record:</strong> 23-8</p>...",
-      "summaryText": "Record: 23-8\nOffRtg: 118.8 (5) ..."
-    }
+      "summaryText": "Record: 23-8\nOffRtg: 118.8 (5) ...",
+    },
     // ...30 teams (or fewer for playoff-only editions), sorted by rank
   ],
-  "rawText": null
+  "rawText": null,
 }
 ```

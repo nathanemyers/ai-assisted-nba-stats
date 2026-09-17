@@ -1,16 +1,16 @@
-import { Ollama } from "ollama";
-import type { Message } from "ollama";
-import { tools, callTool } from "./tools.js";
-import { getSchema } from "./db.js";
+import { Ollama } from 'ollama'
+import type { Message } from 'ollama'
+import { tools, callTool } from './tools.js'
+import { getSchema } from './db.js'
 import defaultConfig from './config.js'
-import { getEnv } from "./env.js";
+import { getEnv } from './env.js'
 
 const OLLAMA_HOST = process.env.OLLAMA_HOST ?? defaultConfig.ollamaHost
-const MAX_TOOL_ITERATIONS = 8;
+const MAX_TOOL_ITERATIONS = 8
 
 export const MODEL = process.env.OLLAMA_MODEL ?? defaultConfig.model
 
-export const client = new Ollama({ host: OLLAMA_HOST });
+export const client = new Ollama({ host: OLLAMA_HOST })
 
 export function buildSystemPrompt(): string {
   return `You are a data analyst who answers questions about NBA history using a local SQLite database.
@@ -31,14 +31,14 @@ Current schema:
 ${getSchema()}
 
 When you call query_database, write a single SQLite SELECT statement. Prefer aggregating in SQL
-(COUNT/SUM/AVG/GROUP BY/ORDER BY/LIMIT) over pulling raw rows, since results are capped at 200 rows.`;
+(COUNT/SUM/AVG/GROUP BY/ORDER BY/LIMIT) over pulling raw rows, since results are capped at 200 rows.`
 }
 
 export interface ToolCallLike {
   function: {
-    name: string;
-    arguments: unknown;
-  };
+    name: string
+    arguments: unknown
+  }
 }
 
 /**
@@ -50,24 +50,25 @@ export async function ask(history: Message[]): Promise<string> {
   const { debug } = getEnv()
   for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
     if (debug) {
-      console.log("asking model: ", history)
+      console.log('asking model: ', history)
     }
     const response = await client.chat({
       model: MODEL,
       messages: history,
       tools,
-    });
+    })
 
-    const message = response.message;
-    history.push(message);
+    const message = response.message
+    history.push(message)
 
-    const toolCalls = (message as unknown as { tool_calls?: ToolCallLike[] }).tool_calls;
+    const toolCalls = (message as unknown as { tool_calls?: ToolCallLike[] })
+      .tool_calls
 
     if (!toolCalls || toolCalls.length === 0) {
       if (debug) {
-        console.log("returning message: ", message)
+        console.log('returning message: ', message)
       }
-      return message.content;
+      return message.content
     }
 
     for (const call of toolCalls) {
@@ -75,29 +76,29 @@ export async function ask(history: Message[]): Promise<string> {
         console.log('performing tool call: ', toolCalls)
       }
       const args =
-        typeof call.function.arguments === "string"
+        typeof call.function.arguments === 'string'
           ? safeJsonParse(call.function.arguments)
-          : call.function.arguments;
+          : call.function.arguments
 
-      const result = await callTool(call.function.name, args);
+      const result = await callTool(call.function.name, args)
 
       history.push({
-        role: "tool",
+        role: 'tool',
         content: result,
-      } as Message);
+      } as Message)
     }
   }
 
   return (
     "I couldn't finish reasoning about that within the tool-call budget " +
     `(${MAX_TOOL_ITERATIONS} round-trips). Try breaking the question into something more specific.`
-  );
+  )
 }
 
 function safeJsonParse(text: string): unknown {
   try {
-    return JSON.parse(text);
+    return JSON.parse(text)
   } catch {
-    return {};
+    return {}
   }
 }

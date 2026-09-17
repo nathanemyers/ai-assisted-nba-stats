@@ -71,7 +71,7 @@ build_db.py` re-downloads the source CSV and regenerates `data/nba.db`
 
 - "What was the Chicago Bulls' record in the 1995-96 season?"
 - "Which team had the highest Elo rating ever, and when?"
-- "How many championships-era games did the Lakers play at home vs away in the 1980s?" *(there's no "championship" flag — see how the model handles a question the schema can't fully answer)*
+- "How many championships-era games did the Lakers play at home vs away in the 1980s?" _(there's no "championship" flag — see how the model handles a question the schema can't fully answer)_
 - "List the 5 largest margins of victory in playoff games."
 - "Has any team won 70+ games in a regular season? Which ones, and how many times?"
 

@@ -1,10 +1,10 @@
 interface Env {
-    debug: boolean
+  debug: boolean
 }
 
 export function getEnv(): Env {
-    const env = process.env
-    return {
-        debug: env.DEBUG?.toLocaleLowerCase() === "true" ? true : false
-    }
+  const env = process.env
+  return {
+    debug: env.DEBUG?.toLocaleLowerCase() === 'true' ? true : false,
+  }
 }
