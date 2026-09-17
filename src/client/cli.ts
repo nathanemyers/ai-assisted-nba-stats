@@ -21,10 +21,6 @@ async function main() {
   while (true) {
     const question = (await rl.question('> ')).trim()
 
-    if (debug) {
-      console.log('question:', question)
-    }
-
     if (!question) continue
     if (question === '/exit' || question === '/quit') break
     if (question === '/reset') {
