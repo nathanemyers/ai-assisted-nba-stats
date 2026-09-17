@@ -1,13 +1,9 @@
-// The tool-calling loop: send the conversation + tool definitions to a
-// local Ollama model, execute whatever tools it asks for, feed the
-// results back, and repeat until it answers in plain text (or we hit a
-// safety cap on the number of tool round-trips).
-
 import { Ollama } from "ollama";
 import type { Message } from "ollama";
 import { tools, callTool } from "./tools.js";
 import { getSchema } from "./db.js";
 import defaultConfig from './config.js'
+import { getEnv } from "./env.js";
 
 const OLLAMA_HOST = process.env.OLLAMA_HOST ?? defaultConfig.ollamaHost
 const MAX_TOOL_ITERATIONS = 8;
@@ -51,7 +47,11 @@ export interface ToolCallLike {
  * place so the caller can keep the running conversation.
  */
 export async function ask(history: Message[]): Promise<string> {
+  const { debug } = getEnv()
   for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
+    if (debug) {
+      console.log("asking model: ", history)
+    }
     const response = await client.chat({
       model: MODEL,
       messages: history,
@@ -64,10 +64,16 @@ export async function ask(history: Message[]): Promise<string> {
     const toolCalls = (message as unknown as { tool_calls?: ToolCallLike[] }).tool_calls;
 
     if (!toolCalls || toolCalls.length === 0) {
+      if (debug) {
+        console.log("returning message: ", message)
+      }
       return message.content;
     }
 
     for (const call of toolCalls) {
+      if (debug) {
+        console.log('performing tool call: ', toolCalls)
+      }
       const args =
         typeof call.function.arguments === "string"
           ? safeJsonParse(call.function.arguments)

@@ -7,6 +7,7 @@
   "scripts": {
     "postinstall": "node scripts/ensure-db.mjs",
     "start": "tsx src/client/cli.ts",
+    "start:debug": "cross-env DEBUG=true tsx src/client/cli.ts",
     "build": "tsc -p .",
     "typecheck": "tsc --noEmit",
     "build-db": "python3 build_db.py",
@@ -15,6 +16,7 @@
   "dependencies": {
     "@modelcontextprotocol/server": "^2.0.0",
     "better-sqlite3": "^11.3.0",
+    "cross-env": "^10.1.0",
     "ollama": "^0.5.9"
   },
   "devDependencies": {
