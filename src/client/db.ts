@@ -11,7 +11,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DB_PATH = path.join(__dirname, "..", "data", "nba.db");
+const DB_PATH = path.join(__dirname, "..", "..", "data", "nba.db");
 
 const MAX_ROWS = 200;
 

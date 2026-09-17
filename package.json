@@ -6,7 +6,7 @@
   "description": "Sandbox: a local LLM (via Ollama) that reasons over a local NBA stats SQLite database using tool calling.",
   "scripts": {
     "postinstall": "node scripts/ensure-db.mjs",
-    "start": "tsx src/cli.ts",
+    "start": "tsx src/client/cli.ts",
     "build": "tsc -p .",
     "typecheck": "tsc --noEmit",
     "build-db": "python3 build_db.py",
