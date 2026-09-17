@@ -4,6 +4,9 @@
 
 import type { Tool } from 'ollama'
 import { getSchema, runQuery } from './db.js'
+import { getEnv } from './env.js'
+
+const { debug } = getEnv()
 
 export const tools: Tool[] = [
   {
@@ -44,6 +47,10 @@ export const tools: Tool[] = [
 
 /** Executes a tool call by name and returns a string suitable for a `tool` message's content. */
 export async function callTool(name: string, args: unknown): Promise<string> {
+  if (debug) {
+    console.log('performing tool call: ', name)
+    console.log('arguments: ', args )
+  }
   try {
     switch (name) {
       case 'get_schema':

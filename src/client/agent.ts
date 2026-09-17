@@ -50,7 +50,28 @@ export async function ask(history: Message[]): Promise<string> {
   const { debug } = getEnv()
   for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
     if (debug) {
-      console.log('asking model: ', history)
+      const readableHistory = history
+        .map((item: Message) => {
+          switch (item.role) {
+            case 'system': {
+              return '>> SYSTEM PROMPT'
+            }
+            case 'user': {
+              return `>> USER: ${item.content}`
+            }
+            case 'assistant': {
+              return `>> AI: ${item.thinking}`
+            }
+            case 'tool': {
+              return `>> TOOL: ${item.content}`
+            }
+            default: {
+              return `>> UNKNOWN: ${item.role}`
+            }
+          }
+        })
+        .join('\n')
+      console.log(readableHistory)
     }
     const response = await client.chat({
       model: MODEL,
@@ -72,9 +93,6 @@ export async function ask(history: Message[]): Promise<string> {
     }
 
     for (const call of toolCalls) {
-      if (debug) {
-        console.log('performing tool call: ', toolCalls)
-      }
       const args =
         typeof call.function.arguments === 'string'
           ? safeJsonParse(call.function.arguments)

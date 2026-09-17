@@ -6,7 +6,6 @@ import { getEnv } from './env.js'
 
 async function main() {
   const { debug } = getEnv()
-  console.log('debug', debug)
 
   console.log(`ai-assisted-nba-stats - model: ${MODEL}`)
   console.log(
