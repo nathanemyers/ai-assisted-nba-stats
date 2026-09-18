@@ -34,6 +34,26 @@ When you call query_database, write a single SQLite SELECT statement. Prefer agg
 (COUNT/SUM/AVG/GROUP BY/ORDER BY/LIMIT) over pulling raw rows, since results are capped at 200 rows.`
 }
 
+function formatMessage(msg: Message) {
+  switch (msg.role) {
+    case 'system': {
+      return '>> SYSTEM PROMPT'
+    }
+    case 'user': {
+      return `>> USER: ${msg.content}`
+    }
+    case 'assistant': {
+      return `>> AI: ${msg.thinking}`
+    }
+    case 'tool': {
+      return `>> TOOL: ${msg.content}`
+    }
+    default: {
+      return `>> UNKNOWN: ${msg.role}`
+    }
+  }
+}
+
 export interface ToolCallLike {
   function: {
     name: string
@@ -49,30 +69,6 @@ export interface ToolCallLike {
 export async function ask(history: Message[]): Promise<string> {
   const { debug } = getEnv()
   for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
-    if (debug) {
-      const readableHistory = history
-        .map((item: Message) => {
-          switch (item.role) {
-            case 'system': {
-              return '>> SYSTEM PROMPT'
-            }
-            case 'user': {
-              return `>> USER: ${item.content}`
-            }
-            case 'assistant': {
-              return `>> AI: ${item.thinking}`
-            }
-            case 'tool': {
-              return `>> TOOL: ${item.content}`
-            }
-            default: {
-              return `>> UNKNOWN: ${item.role}`
-            }
-          }
-        })
-        .join('\n')
-      console.log(readableHistory)
-    }
     const response = await client.chat({
       model: MODEL,
       messages: history,
@@ -80,6 +76,9 @@ export async function ask(history: Message[]): Promise<string> {
     })
 
     const message = response.message
+    if (debug) {
+      console.log(formatMessage(message))
+    }
     history.push(message)
 
     const toolCalls = (message as unknown as { tool_calls?: ToolCallLike[] })
