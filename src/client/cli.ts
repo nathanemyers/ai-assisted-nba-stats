@@ -1,8 +1,14 @@
 import readline from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import type { Message } from 'ollama'
-import { ask, buildSystemPrompt, MODEL } from './agent.js'
+import { ask, MODEL } from './agent.js'
 import { getEnv } from './env.js'
+import { readFileSync } from 'node:fs'
+
+const systemPrompt = readFileSync(
+  new URL('./systemPrompt.md', import.meta.url),
+  'utf-8'
+)
 
 async function main() {
   const { debug } = getEnv()
@@ -15,7 +21,7 @@ async function main() {
     console.log('Debug is ENABLED')
   }
 
-  const history: Message[] = [{ role: 'system', content: buildSystemPrompt() }]
+  const history: Message[] = [{ role: 'system', content: systemPrompt }]
   const rl = readline.createInterface({ input: stdin, output: stdout })
 
   while (true) {

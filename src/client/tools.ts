@@ -14,8 +14,7 @@ export const tools: Tool[] = [
     function: {
       name: 'get_schema',
       description:
-        'Returns the SQL schema (CREATE TABLE / CREATE VIEW statements) of the local NBA SQLite database. ' +
-        "Call this first if you're unsure of exact column names.",
+        'Returns the SQL schema (CREATE TABLE / CREATE VIEW statements) of the local NBA SQLite database. Call this first if you do not know the schema of the database.',
       parameters: {
         type: 'object',
         properties: {},
@@ -28,9 +27,7 @@ export const tools: Tool[] = [
     function: {
       name: 'query_database',
       description:
-        'Runs a single read-only SQL SELECT query against the local NBA SQLite database and returns the ' +
-        'resulting rows as JSON. Only SELECT/WITH statements are allowed - no writes. Results are capped ' +
-        'at 200 rows, so aggregate (COUNT/SUM/AVG/GROUP BY) or add LIMIT/ORDER BY rather than pulling raw rows.',
+        'Runs a single read-only SQL SELECT query against the local NBA SQLite database and returns the resulting rows as JSON. Only SELECT/WITH statements are allowed - no writes. Results are capped at 200 rows, so aggregate (COUNT/SUM/AVG/GROUP BY) or add LIMIT/ORDER BY rather than pulling raw rows. If you do not know the database schema first call get_schema.',
       parameters: {
         type: 'object',
         properties: {
@@ -49,7 +46,7 @@ export const tools: Tool[] = [
 export async function callTool(name: string, args: unknown): Promise<string> {
   if (debug) {
     console.log('performing tool call: ', name)
-    console.log('arguments: ', args )
+    console.log('arguments: ', args)
   }
   try {
     switch (name) {
