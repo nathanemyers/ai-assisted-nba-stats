@@ -1,7 +1,7 @@
 import { CallToolResult, Client } from '@modelcontextprotocol/client'
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio'
 import type { Tool, ToolCall } from 'ollama'
-import { getEnv } from '../client/env.js'
+import { getEnv } from '../env.js'
 import { manifest, MCPServerConfig } from './stdioManifest.js'
 
 const { debug } = getEnv()

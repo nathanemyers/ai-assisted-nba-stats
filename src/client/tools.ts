@@ -3,8 +3,8 @@
 // wants" and "code decides what's allowed to happen."
 
 import type { Tool } from 'ollama'
-import { getSchema, runQuery } from './db.js'
-import { getEnv } from './env.js'
+import { getSchema, runQuery } from '../MCP/nbaElo/db.js'
+import { getEnv } from '../env.js'
 
 const { debug } = getEnv()
 

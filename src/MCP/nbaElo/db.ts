@@ -1,17 +1,9 @@
-// Thin, deliberately restricted wrapper around the local SQLite database.
-//
-// This is a sandbox project: the "safety" here (SELECT-only, single
-// statement, row cap) is a basic heuristic to keep a locally-running LLM
-// from doing anything destructive to the file, not a hardened security
-// boundary. Fine for a single-user local demo; do not reuse this as-is
-// against an untrusted database or a multi-user service.
-
 import Database from 'better-sqlite3'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const DB_PATH = path.join(__dirname, '..', '..', 'data', 'nba.db')
+const DB_PATH = path.join(__dirname, '..', '..', '..', 'data', 'nba.db')
 
 const MAX_ROWS = 200
 

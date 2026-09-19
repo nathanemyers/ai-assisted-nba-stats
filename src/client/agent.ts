@@ -1,9 +1,11 @@
 import { Ollama } from 'ollama'
 import type { Message, Tool, ToolCall } from 'ollama'
-import { tools, callTool } from './tools.js'
+// import { tools, callTool } from './tools.js'
 import { callMCPTool, getMCPTools, lookupMCPTool } from '../MCP/MCPClient.js'
 import defaultConfig from './config.js'
-import { getEnv } from './env.js'
+import { getEnv } from '../env.js'
+
+const tools: Tool[] = []
 
 const OLLAMA_HOST = process.env.OLLAMA_HOST ?? defaultConfig.ollamaHost
 const MAX_TOOL_ITERATIONS = 8
@@ -85,7 +87,8 @@ export async function ask(history: Message[]): Promise<string> {
           args as Record<string, unknown>
         )
       } else {
-        result = await callTool(call.function.name, args)
+        throw new Error('no calling of tools!')
+        // result = await callTool(call.function.name, args)
       }
 
       history.push({

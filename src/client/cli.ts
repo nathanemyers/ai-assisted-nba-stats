@@ -2,7 +2,7 @@ import readline from 'node:readline/promises'
 import { stdin, stdout } from 'node:process'
 import type { Message } from 'ollama'
 import { ask, MODEL } from './agent.js'
-import { getEnv } from './env.js'
+import { getEnv } from '../env.js'
 import { readFileSync } from 'node:fs'
 
 const systemPrompt = readFileSync(

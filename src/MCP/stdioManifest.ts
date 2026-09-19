@@ -15,4 +15,9 @@ export const manifest: MCPServerConfig[] = [
     version: '1.0.0',
     path: 'src/MCP/weather/index.ts',
   },
+  {
+    name: 'nbaElo',
+    version: '1.0.0',
+    path: 'src/MCP/nbaElo/index.ts',
+  },
 ]
