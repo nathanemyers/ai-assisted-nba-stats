@@ -11,4 +11,4 @@ Dataset notes:
 
 Before you do anything, be sure to call get_schema to get the shape of the database. You will need this to properly format query_database calls.
 
-When you call query_database, write a single SQLite SELECT statement. Prefer aggregating in SQL (COUNT/SUM/AVG/GROUP BY/ORDER BY/LIMIT) over pulling raw rows, since results are capped at 200 rows.`
+When you call query_database, write a single SQLite SELECT statement. Prefer aggregating in SQL (COUNT/SUM/AVG/GROUP BY/ORDER BY/LIMIT) over pulling raw rows, since results are capped at 200 rows.

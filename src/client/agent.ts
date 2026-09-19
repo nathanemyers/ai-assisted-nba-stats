@@ -1,6 +1,7 @@
 import { Ollama } from 'ollama'
-import type { Message } from 'ollama'
+import type { Message, Tool, ToolCall } from 'ollama'
 import { tools, callTool } from './tools.js'
+import { callMCPTool, getMCPTools } from './MCPClient.js'
 import defaultConfig from './config.js'
 import { getEnv } from './env.js'
 
@@ -31,13 +32,6 @@ function formatMessage(msg: Message) {
   }
 }
 
-export interface ToolCallLike {
-  function: {
-    name: string
-    arguments: unknown
-  }
-}
-
 /**
  * Runs the tool-calling loop on top of an existing message history and
  * returns the model's final plain-text answer. `history` is mutated in
@@ -45,11 +39,14 @@ export interface ToolCallLike {
  */
 export async function ask(history: Message[]): Promise<string> {
   const { debug } = getEnv()
+  const MCPTools = await getMCPTools()
+  const allTools: Tool[] = [...tools, ...MCPTools]
+
   for (let i = 0; i < MAX_TOOL_ITERATIONS; i++) {
     const response = await client.chat({
       model: MODEL,
       messages: history,
-      tools,
+      tools: allTools,
     })
 
     const message = response.message
@@ -58,7 +55,7 @@ export async function ask(history: Message[]): Promise<string> {
     }
     history.push(message)
 
-    const toolCalls = (message as unknown as { tool_calls?: ToolCallLike[] })
+    const toolCalls = (message as unknown as { tool_calls?: ToolCall[] })
       .tool_calls
 
     if (!toolCalls || toolCalls.length === 0) {
@@ -74,7 +71,20 @@ export async function ask(history: Message[]): Promise<string> {
           ? safeJsonParse(call.function.arguments)
           : call.function.arguments
 
-      const result = await callTool(call.function.name, args)
+      let result
+
+      const isMCPToolCall = MCPTools.map((tool) => tool.function.name).includes(
+        call.function.name
+      )
+      if (isMCPToolCall) {
+        if (debug) {
+          console.log(`Calling MCP Tool: ${call.function.name}`)
+        }
+
+        result = await callMCPTool(call, args as Record<string, unknown>)
+      } else {
+        result = await callTool(call.function.name, args)
+      }
 
       history.push({
         role: 'tool',
