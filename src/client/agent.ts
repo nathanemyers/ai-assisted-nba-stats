@@ -1,7 +1,7 @@
 import { Ollama } from 'ollama'
 import type { Message, Tool, ToolCall } from 'ollama'
 import { tools, callTool } from './tools.js'
-import { callMCPTool, getMCPTools } from './MCPClient.js'
+import { callMCPTool, getMCPTools } from '../MCP/MCPClient.js'
 import defaultConfig from './config.js'
 import { getEnv } from './env.js'
 

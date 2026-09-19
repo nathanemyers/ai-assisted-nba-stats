@@ -1,7 +1,7 @@
 import { CallToolResult, Client } from '@modelcontextprotocol/client'
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio'
-import type { Message, Tool, ToolCall } from 'ollama'
-import { getEnv } from './env.js'
+import type { Tool, ToolCall } from 'ollama'
+import { getEnv } from '../client/env.js'
 
 let client: Client
 
@@ -30,7 +30,7 @@ async function connect(): Promise<Client> {
 
   const transport = new StdioClientTransport({
     command: 'npx',
-    args: ['tsx', 'src/server/testMCP/index.ts'],
+    args: ['tsx', 'src/MCP/helloWorld/index.ts'],
   })
 
   await client.connect(transport)
