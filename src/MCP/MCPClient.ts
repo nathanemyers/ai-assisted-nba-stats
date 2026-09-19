@@ -2,10 +2,43 @@ import { CallToolResult, Client } from '@modelcontextprotocol/client'
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio'
 import type { Tool, ToolCall } from 'ollama'
 import { getEnv } from '../client/env.js'
-
-let client: Client
+import { manifest, MCPServerConfig } from './stdioManifest.js'
 
 const { debug } = getEnv()
+
+interface ClientEntry {
+  name: string
+  client: Client
+}
+let clientList: ClientEntry[] = []
+
+async function initializeMCPClients(): Promise<ClientEntry[]> {
+  const clients = await Promise.all(
+    manifest.map(async (server) => {
+      const client = await connect(server)
+      return {
+        name: server.name,
+        client,
+      }
+    })
+  )
+
+  return clients
+}
+
+export async function lookupMCPTool(
+  toolName: string
+): Promise<string | undefined> {
+  const clientList = await getMCPClients()
+
+  for (const clientEntry of clientList) {
+    const tools = await clientEntry.client.listTools()
+    if (tools.tools.find((tool) => tool.name === toolName)) {
+      return clientEntry.name
+    }
+  }
+  return undefined
+}
 
 function mcpToolToOllamaTool(tool: Partial<CallToolResult>): Tool {
   return {
@@ -25,31 +58,40 @@ function formatToolResult(result: CallToolResult): string {
   return result.isError ? `Error: ${text}` : text
 }
 
-async function connect(): Promise<Client> {
-  const client = new Client({ name: 'hello-world', version: '1.0.0' })
+async function connect(server: MCPServerConfig): Promise<Client> {
+  const client = new Client({ name: server.name, version: server.version })
 
   const transport = new StdioClientTransport({
     command: 'npx',
-    args: ['tsx', 'src/MCP/helloWorld/index.ts'],
+    args: ['tsx', server.path],
   })
 
   await client.connect(transport)
   return client
 }
 
-export async function getMCPClient() {
-  if (!client) {
-    client = await connect()
+export async function getMCPClients() {
+  if (clientList.length === 0) {
+    clientList = await initializeMCPClients()
   }
-  return client
+  return clientList
 }
 
 export async function callMCPTool(
+  clientName: string,
   call: ToolCall,
   args: Record<string, unknown>
 ) {
-  const client = await getMCPClient()
-  const MCPResult = await client.callTool({
+  const clientList = await getMCPClients()
+  const clientEntry = clientList.find(
+    (clientEntry) => clientEntry.name === clientName
+  )
+
+  if (!clientEntry) {
+    throw new Error(`Unable to lookup client with name: ${clientName}`)
+  }
+
+  const MCPResult = await clientEntry.client.callTool({
     name: call.function.name,
     arguments: args,
   })
@@ -62,7 +104,12 @@ export async function callMCPTool(
 }
 
 export async function getMCPTools(): Promise<Tool[]> {
-  const client = await getMCPClient()
-  const result = await client.listTools()
-  return result.tools.map(mcpToolToOllamaTool)
+  const clientList = await getMCPClients()
+  const result = await Promise.all(
+    clientList.map(async (clientEntry) => {
+      const { tools } = await clientEntry.client.listTools()
+      return tools.map(mcpToolToOllamaTool)
+    })
+  )
+  return result.flat()
 }

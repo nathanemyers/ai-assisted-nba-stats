@@ -1,7 +1,7 @@
 import { Ollama } from 'ollama'
 import type { Message, Tool, ToolCall } from 'ollama'
 import { tools, callTool } from './tools.js'
-import { callMCPTool, getMCPTools } from '../MCP/MCPClient.js'
+import { callMCPTool, getMCPTools, lookupMCPTool } from '../MCP/MCPClient.js'
 import defaultConfig from './config.js'
 import { getEnv } from './env.js'
 
@@ -73,15 +73,17 @@ export async function ask(history: Message[]): Promise<string> {
 
       let result
 
-      const isMCPToolCall = MCPTools.map((tool) => tool.function.name).includes(
-        call.function.name
-      )
-      if (isMCPToolCall) {
+      const MCPClient = await lookupMCPTool(call.function.name)
+      if (MCPClient) {
         if (debug) {
           console.log(`Calling MCP Tool: ${call.function.name}`)
         }
 
-        result = await callMCPTool(call, args as Record<string, unknown>)
+        result = await callMCPTool(
+          MCPClient,
+          call,
+          args as Record<string, unknown>
+        )
       } else {
         result = await callTool(call.function.name, args)
       }
