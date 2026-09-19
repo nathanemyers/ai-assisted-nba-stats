@@ -10,4 +10,9 @@ export const manifest: MCPServerConfig[] = [
     version: '1.0.0',
     path: 'src/MCP/helloWorld/index.ts',
   },
+  {
+    name: 'weather',
+    version: '1.0.0',
+    path: 'src/MCP/weather/index.ts',
+  },
 ]

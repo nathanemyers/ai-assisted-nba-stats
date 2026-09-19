@@ -51,3 +51,5 @@ function createServer(): McpServer {
 
   return server
 }
+
+serveStdio(createServer)
